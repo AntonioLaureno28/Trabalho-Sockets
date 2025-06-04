@@ -42,7 +42,7 @@ def gerenciar_jogadas(conexao, endereco):
                 time.sleep(2)
         conexao.sendall("O jogo vai começar".encode('utf-8'))
 
-
+        conexao.sendall("Faça sua jogada".encode('utf-8'))
         jogada = conexao.recv(1024).decode('utf-8')
         with lock:
             jogadas[conexao] = jogada
@@ -66,6 +66,9 @@ def gerenciar_jogadas(conexao, endereco):
                 jogadores.clear()
                 jogadas.clear()
 
+        while conexao in jogadores:
+            time.sleep(0.5) # Espera um pouco para não sobrecarregar a CPU
+
     except Exception as e:
         print("Ocorreu um erro ao receber a jogada")
     finally:
@@ -73,7 +76,7 @@ def gerenciar_jogadas(conexao, endereco):
         conexao.close()
 
 
-host = gethostname()
+host = '0.0.0.0'
 port = 55551
 
 print(host, port)
