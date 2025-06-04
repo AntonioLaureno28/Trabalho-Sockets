@@ -1,33 +1,35 @@
 from socket import *
 
 #Deve ser substituído pelo endereço do servidor
-IP_ADRESS = "192.168.2.22"
+IP_ADRESS = 'REDACTED'
 port = 55551
 
 #Criação do Socket com endereço IPV4 para realizar comunicação TCP
-client = socket(socket.AF_INET, socket.SOCK_STREAM)
+client = socket(AF_INET, SOCK_STREAM)
 
-#Conexão do cliente com o servidor naquele endereço IP
-client.connect(IP_ADRESS, port)
-server_response = client.recv(1024).decode('utf-8')
+try:
+    #Conexão do cliente com o servidor naquele endereço IP
+    client.connect((IP_ADRESS, port))
 
-#Esperando a primeira resposta do servidor
-if server_response == "O jogo vai começar":
-    server_response = client.recv(1024).decode('utf-8')
+    while True:
+        server_response = client.recv(1024).decode('utf-8')
+        print(server_response)
+        #Jogo iniciado 
+        if server_response == "Faça sua jogada":
+            jogada = ""
+            jogada = input().lower()
+            client.sendall(jogada.encode('utf-8'))
+            resultado = client.recv(1024).decode('utf-8')
+            print(resultado)
+            break
 
-    #Jogo iniciado 
-    if server_response == "Faça sua jogada":
-        jogada = input().lower()
-        client.sendall(jogada.encode('utf-8'))
-        resultado = client.recv(1024).decode('utf-8')
-        print(resultado)
-
-#Caso de o jogo ainda não poder ser inicializado
-else:
-    print(server_response)
-
-#Fecha a conexão com o servidor
-client.close()
+except socket.error as e:
+    print(e)
+finally:
+    #Fecha a conexão com o servidor
+    print("Fechando a conexão...")
+    input("Pressione Enter para encerrar")
+    client.close()
 
 
 
